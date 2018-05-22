@@ -8,7 +8,7 @@ Scene* HelloWorld::createScene()
     return HelloWorld::create();
 }
 
-// Print useful error message instead of segfaulting when files are not there.
+// Print useful error message instead of segfaulting when files are not there.test
 static void problemLoading(const char* filename)
 {
     printf("Error while loading: %s\n", filename);
