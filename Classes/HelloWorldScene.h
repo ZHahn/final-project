@@ -1,6 +1,6 @@
 #ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
-
+#include "MyScene.h"
 #include "cocos2d.h"
 
 

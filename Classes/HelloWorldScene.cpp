@@ -3,6 +3,15 @@
 
 USING_NS_CC;
 
+// 按钮点击事件，点击后启动MyScene
+void HelloWorld::menuNextCallback(Ref* pSender)
+{
+	//新建MyScene实例
+	auto scene = MyScene::createScene();
+	//用这MyScene实例替换当前scene
+	Director::getInstance()->replaceScene(scene);
+}
+
 Scene* HelloWorld::createScene()
 {
     return HelloWorld::create();
@@ -37,7 +46,7 @@ bool HelloWorld::init()
                                            "CloseNormal.png",
                                            "CloseSelected.png",
                                            CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-
+	
     if (closeItem == nullptr ||
         closeItem->getContentSize().width <= 0 ||
         closeItem->getContentSize().height <= 0)
@@ -50,11 +59,18 @@ bool HelloWorld::init()
         float y = origin.y + closeItem->getContentSize().height/2;
         closeItem->setPosition(Vec2(x,y));
     }
+	//我的改动
+	// 新建一个带图片的按钮菜单
+	auto goItem = MenuItemImage::create("CloseNormal.png", "CloseSelected.png",
+		CC_CALLBACK_1(HelloWorld::menuNextCallback, this));
+	goItem->setPosition(Vec2(origin.x + visibleSize.width / 2 - closeItem->getContentSize().width / 2, origin.y / 2 + closeItem->getContentSize().height / 2));
 
+	//结束改动
     // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
+    auto menu = Menu::create(closeItem,goItem, NULL);  //此处原来为(closeItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
+	
 
     /////////////////////////////
     // 3. add your codes below...
