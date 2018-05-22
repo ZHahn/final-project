@@ -3,13 +3,9 @@
 
 #include "cocos2d.h"
 
-
 class HelloWorld : public cocos2d::Scene
 {
 public:
-	//切换到下一个scene事件
-
-	void menuNextCallback(cocos2d::Ref* pSender);
     static cocos2d::Scene* createScene();
 
     virtual bool init();
