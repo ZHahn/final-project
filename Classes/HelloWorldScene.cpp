@@ -3,13 +3,13 @@
 
 USING_NS_CC;
 
-// 按钮点击事件，点击后启动MyScene
+// 按钮点击事件，点击后push到MyScene
 void HelloWorld::menuNextCallback(Ref* pSender)
 {
 	//新建MyScene实例
 	auto scene = MyScene::createScene();
 	//用这MyScene实例替换当前scene
-	Director::getInstance()->replaceScene(scene);
+	Director::getInstance()->pushScene(scene);
 }
 
 Scene* HelloWorld::createScene()
@@ -65,9 +65,23 @@ bool HelloWorld::init()
 		CC_CALLBACK_1(HelloWorld::menuNextCallback, this));
 	goItem->setPosition(Vec2(origin.x + visibleSize.width / 2 - closeItem->getContentSize().width / 2, origin.y / 2 + closeItem->getContentSize().height / 2));
 
+	MenuItemFont::setFontName("Times New Roman");
+	MenuItemFont::setFontSize(86);
+	MenuItemFont* placeMenu = MenuItemFont::create("PLACE", CC_CALLBACK_1(HelloWorld::OnClickMenu, this));
+	placeMenu->setTag(PLACE_TAG);
+	MenuItemFont* flipXMenu = MenuItemFont::create("FlipX", CC_CALLBACK_1(HelloWorld::OnClickMenu, this));
+	flipXMenu->setTag(FLIPX_TAG);
+	
+	auto mn = Menu::create(placeMenu, flipXMenu, NULL);
+	mn->alignItemsVertically();
+	this->addChild(mn);
+
+
 	//结束改动
+	
+
     // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem,goItem, NULL);  //此处原来为(closeItem, NULL);
+    auto menu = Menu::create(closeItem, goItem, NULL);  //此处原来为(closeItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
 	
@@ -126,4 +140,18 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     //_eventDispatcher->dispatchEvent(&customEndEvent);
 
 
+}
+
+void HelloWorld::OnClickMenu(Ref* pSpender)
+{
+	MenuItem* nmitem = (MenuItem*)pSpender;
+
+	auto sc = Scene::create();
+	auto layer = MyAction::create();
+	layer->setTag(nmitem->getTag());
+
+	sc->addChild(layer);
+
+	auto reScene = TransitionSlideInR::create(1.0f, sc);
+	Director::getInstance()->replaceScene(reScene);
 }
