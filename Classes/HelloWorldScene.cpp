@@ -37,6 +37,28 @@ bool HelloWorld::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+	////贴图
+	//auto bg = Sprite::create("BackGroundTile.png", Rect(0, 0, visibleSize.width, visibleSize.height));
+	////贴图的纹理参数
+	//Texture2D::TexParams tp = { GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT };
+	//bg->getTexture()->setTexParameters(tp);
+	//bg->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	//addChild(bg, 0);
+
+	//创建三个方块精灵
+	Sprite* boxA = Sprite::create("BoxA2.png");
+	boxA->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2) + Vec2(-120, 120));
+	addChild(boxA, 10, kBoxA_Tag);
+
+	Sprite* boxB = Sprite::create("BoxB2.png");
+	boxA->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	addChild(boxB, 20, kBoxB_Tag);
+
+	Sprite* boxC = Sprite::create("BoxC2.png");
+	boxA->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2) + Vec2(120, 160));
+	addChild(boxC, 30, kBoxC_Tag);
+
+
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
@@ -154,4 +176,74 @@ void HelloWorld::OnClickMenu(Ref* pSpender)
 
 	auto reScene = TransitionSlideInR::create(1.0f, sc);
 	Director::getInstance()->replaceScene(reScene);
+}
+
+void HelloWorld::onEnter()
+{
+	Scene::onEnter();
+	log("HelloWorld onEnter");
+	auto listener = EventListenerTouchOneByOne::create();
+
+	listener->setSwallowTouches(true);
+	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::touchBegan, this);
+	listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::touchMoved, this);
+	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::touchEnded, this);
+
+	//注册监听器
+	EventDispatcher* eventDispatcher = Director::getInstance()->getEventDispatcher();
+	eventDispatcher->addEventListenerWithSceneGraphPriority(listener, getChildByTag(kBoxA_Tag));
+	eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(), getChildByTag(kBoxB_Tag));
+	eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(), getChildByTag(kBoxC_Tag));
+}
+
+bool HelloWorld::touchBegan(Touch* touch, Event* event)
+{
+	//获取事件所绑定的target
+	auto target = static_cast<Sprite*>(event->getCurrentTarget());
+	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
+	Size s = target->getContentSize();
+	Rect rect = Rect(0, 0, s.width, s.height);
+
+	//单击范围判断检测
+	if (rect.containsPoint(locationInNode))
+	{
+		log("sprite x = %f, y = %f", locationInNode.x, locationInNode.y);
+		log("sprite tag = %d", target->getTag());
+		target->runAction(ScaleBy::create(0.06f, 1.06f));
+		return true;
+	}
+	return false;
+}
+
+void HelloWorld::touchMoved(Touch* touch, Event* event)
+{
+	log("onTouchMoved");
+	auto target = static_cast<Sprite*>(event->getCurrentTarget());
+	target->setPosition(target->getPosition() + touch->getDelta());
+}
+
+void HelloWorld::touchEnded(Touch* touch, Event* event)
+{
+	log("onTouchEnded");
+	auto target = static_cast<Sprite*>(event->getCurrentTarget());
+	log("sprite onTouchesEnded");
+
+	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
+	Size s = target->getContentSize();
+	Rect rect = Rect(0, 0, s.width, s.height);
+	//单击范围判断检测
+	if (rect.containsPoint(locationInNode))
+	{
+		log("sprite x = %f, y = %f", locationInNode.x, locationInNode.y);
+		log("sprite.tag = %d", target->getTag());
+		target->runAction(ScaleTo::create(0.06f, 1.0f));
+	}
+}
+
+void HelloWorld::onExit()
+{
+	Scene::onExit();
+	log("HelloWorld onExit");
+	Director::getInstance()->getEventDispatcher()->removeAllEventListeners();
+
 }

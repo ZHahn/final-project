@@ -12,6 +12,15 @@ typedef enum
 	,TOGGLE_TAG
 } ActionTypes;
 
+typedef enum
+{
+	kBoxA_Tag = 102
+	,kBoxB_Tag
+	,kBoxC_Tag
+}SpriteTags;
+
+
+
 
 class HelloWorld : public cocos2d::Scene
 {
@@ -22,6 +31,13 @@ public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
+	//单点事件
+	virtual void onEnter();
+	virtual void onExit();
+
+	bool touchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+	void touchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
+	void touchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
