@@ -1,6 +1,12 @@
 #pragma once
 #include "cocos2d.h"  
+#include"SpritesStorageLayer.h"
 USING_NS_CC;
+
+
+
+
+
 class MyScene : public cocos2d::CCLayer
 {
 public:
@@ -8,5 +14,16 @@ public:
 	virtual bool init();
 	void menuItem1Callback(cocos2d::Ref* pSpender);
 	void menuItem2Callback(cocos2d::Ref* pSpender);
+
+	//单点事件
+
+	
+
+	virtual bool onTouchBegan(cocos2d::Touch* touch, Event* event);
+	virtual void onTouchMoved(cocos2d::Touch* touch, Event* event);
+	virtual void onTouchEnded(cocos2d::Touch* touch, Event* event);
+
+	
+
 	CREATE_FUNC(MyScene);
 };

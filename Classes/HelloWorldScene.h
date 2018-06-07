@@ -17,12 +17,12 @@ typedef enum
 	kBoxA_Tag = 102
 	,kBoxB_Tag
 	,kBoxC_Tag
-}SpriteTags;
+}_SpriteTags;
 
 
 
 
-class HelloWorld : public cocos2d::Scene
+class HelloWorld : public cocos2d::Layer
 {
 public:
 	//切换到下一个scene事件

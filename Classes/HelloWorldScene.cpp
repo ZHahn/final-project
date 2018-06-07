@@ -14,7 +14,10 @@ void HelloWorld::menuNextCallback(Ref* pSender)
 
 Scene* HelloWorld::createScene()
 {
-    return HelloWorld::create();
+	auto scene = Scene::create();
+	auto layer = HelloWorld::create();
+	scene->addChild(layer);
+	return scene;
 }
 
 // Print useful error message instead of segfaulting when files are not there.test
@@ -29,7 +32,7 @@ bool HelloWorld::init()
 {
     //////////////////////////////
     // 1. super init first
-    if ( !Scene::init() )
+    if ( !Layer::init() )
     {
         return false;
     }
@@ -180,7 +183,7 @@ void HelloWorld::OnClickMenu(Ref* pSpender)
 
 void HelloWorld::onEnter()
 {
-	Scene::onEnter();
+	Layer::onEnter();
 	log("HelloWorld onEnter");
 	auto listener = EventListenerTouchOneByOne::create();
 
@@ -217,9 +220,9 @@ bool HelloWorld::touchBegan(Touch* touch, Event* event)
 
 void HelloWorld::touchMoved(Touch* touch, Event* event)
 {
-	log("onTouchMoved");
+	/*log("onTouchMoved");
 	auto target = static_cast<Sprite*>(event->getCurrentTarget());
-	target->setPosition(target->getPosition() + touch->getDelta());
+	target->setPosition(target->getPosition() + touch->getDelta());*/
 }
 
 void HelloWorld::touchEnded(Touch* touch, Event* event)
@@ -232,18 +235,19 @@ void HelloWorld::touchEnded(Touch* touch, Event* event)
 	Size s = target->getContentSize();
 	Rect rect = Rect(0, 0, s.width, s.height);
 	//µ¥»÷·¶Î§ÅÐ¶Ï¼ì²â
-	if (rect.containsPoint(locationInNode))
+	/*if (rect.containsPoint(locationInNode))
 	{
 		log("sprite x = %f, y = %f", locationInNode.x, locationInNode.y);
 		log("sprite.tag = %d", target->getTag());
 		target->runAction(ScaleTo::create(0.06f, 1.0f));
-	}
+	}*/
+	target->runAction(MoveTo::create(2, touch->getLocation()));
 }
 
 void HelloWorld::onExit()
 {
-	Scene::onExit();
+	Layer::onExit();
 	log("HelloWorld onExit");
-	Director::getInstance()->getEventDispatcher()->removeAllEventListeners();
+	Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(getChildByTag(kBoxA_Tag));
 
 }
