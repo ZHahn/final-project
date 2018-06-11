@@ -1,17 +1,21 @@
 //打算在此场景中加入自己写的layer，用于存放可操作的精灵，位于地图上层，触摸时先检测是否点击精灵，
 //若否，根据点击位置移动已锁定的精灵，2018年6月5日00点01分
+//2018.6.11添加碰撞测试
 
 
 
 #include "MyScene.h"
 USING_NS_CC;
-
+const PhysicsMaterial PHYSICSBODY_MATERIAL_NOmoca(0.1f, 0.5f, 0.0f);
 Sprite* SpritesStorageLayer::target = NULL;		//静态成员变量初始化
 Vec2 SpritesStorageLayer::targetLocation(0, 0);
 
 Scene* MyScene::createScene()
 {
-	auto scene = Scene::create();
+	auto scene = Scene::createWithPhysics();
+	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	Vec2 gravity0(0, 0.0f);
+	scene->getPhysicsWorld()->setGravity(gravity0);
 	auto layer = MyScene::create();
 	auto spriteLayer = SpritesStorageLayer::create();
 	scene->addChild(spriteLayer, 100);
@@ -48,6 +52,13 @@ bool MyScene::init()
 	//获取手机可视屏原点的坐标
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+	//定义边界的世界
+	auto body = PhysicsBody::createEdgeBox(visibleSize, PHYSICSBODY_MATERIAL_NOmoca, 5.0f);
+	auto edgeNode = Node::create();
+	edgeNode->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	edgeNode->setPhysicsBody(body);
+	this->addChild(edgeNode);
+
 	
 
 	
@@ -79,15 +90,15 @@ bool MyScene::init()
 
 	
 
-	//添加精灵测试
-	MenuItemFont::setFontName("Times New Roman");
-	MenuItemFont::setFontSize(86);
-	MenuItemFont* item1 = MenuItemFont::create("Start game", CC_CALLBACK_1(MyScene::menuItem1Callback, this));
-	MenuItemAtlasFont* item2 = MenuItemAtlasFont::create("Help", "menu/help.png", 48, 65, ' ',
-		CC_CALLBACK_1(MyScene::menuItem2Callback, this));
-	Menu* mn = Menu::create(item1, item2, NULL);
-	mn->alignItemsVertically();
-	this->addChild(mn);
+	////添加精灵测试
+	//MenuItemFont::setFontName("Times New Roman");
+	//MenuItemFont::setFontSize(86);
+	//MenuItemFont* item1 = MenuItemFont::create("Start game", CC_CALLBACK_1(MyScene::menuItem1Callback, this));
+	//MenuItemAtlasFont* item2 = MenuItemAtlasFont::create("Help", "menu/help.png", 48, 65, ' ',
+	//	CC_CALLBACK_1(MyScene::menuItem2Callback, this));
+	//Menu* mn = Menu::create(item1, item2, NULL);
+	//mn->alignItemsVertically();
+	//this->addChild(mn);
 	return true;
 }
 
@@ -114,4 +125,10 @@ void MyScene::onTouchEnded(Touch* touch, Event* event)
 {
 
 }
+
+//void MyScene::onEnter()
+//{
+//	Layer::onEnter();
+//
+//}
 

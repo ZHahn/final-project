@@ -23,6 +23,9 @@ public:
 	virtual void onTouchMoved(cocos2d::Touch* touch, Event* event);
 	virtual void onTouchEnded(cocos2d::Touch* touch, Event* event);
 
+	/*virtual void onEnter();*/
+	//virtual void onExit();
+
 	
 
 	CREATE_FUNC(MyScene);

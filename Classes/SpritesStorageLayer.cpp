@@ -13,18 +13,27 @@ bool SpritesStorageLayer::init()
 	//获取手机可视屏原点的坐标
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	
+
 
 	//创建三个方块精灵
 	Sprite* boxA = Sprite::create("BoxA.png");
+	auto bodyA = PhysicsBody::createCircle(boxA->getContentSize().width/2);
+	bodyA->setContactTestBitmask(0xFFFFFFFF);
+	boxA->setPhysicsBody(bodyA);
 	boxA->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	addChild(boxA, 10, kBox1_Tag);
 
 	Sprite* boxB = Sprite::create("BoxB.png");
-	boxB->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height/2) + Vec2(40, 50));
+	auto bodyB = PhysicsBody::createCircle(boxB->getContentSize().width / 2);
+	bodyB->setContactTestBitmask(0xFFFFFFFF);
+	boxB->setPhysicsBody(bodyB);
+	boxB->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2) + Vec2(40, 50));
 	addChild(boxB, 20, kBox2_Tag);
 
 	Sprite* boxC = Sprite::create("BoxC.png");
+	auto bodyC = PhysicsBody::createCircle(boxC->getContentSize().width / 2);
+	bodyC->setContactTestBitmask(0xFFFFFFFF);
+	boxC->setPhysicsBody(bodyC);
 	boxC->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2) + Vec2(60, 20));
 	addChild(boxC, 30, kBox3_Tag);
 
@@ -47,6 +56,42 @@ void SpritesStorageLayer::onEnter()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1, getChildByTag(kBox1_Tag));
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1->clone(), getChildByTag(kBox2_Tag));
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1->clone(), getChildByTag(kBox3_Tag));
+
+	//碰撞检测监听器
+	auto phylistener = EventListenerPhysicsContact::create();
+	phylistener->onContactBegin = [](PhysicsContact& contact)
+	{
+		auto spriteA = (Sprite*)contact.getShapeA()->getBody()->getNode();
+		auto spriteB = (Sprite*)contact.getShapeB()->getBody()->getNode();
+
+		if (spriteA && spriteA->getTag() == 1
+			&& spriteB && spriteB->getTag() == 1)
+		{
+			spriteA->setColor(Color3B::YELLOW);
+			spriteB->setColor(Color3B::YELLOW);
+		}
+		return true;
+	};
+	phylistener->onContactPreSolve = [](PhysicsContact& contact, PhysicsContactPreSolve& solve) {
+		return true;
+	};
+	phylistener->onContactPostSolve = [](PhysicsContact& contact, const PhysicsContactPostSolve& solve) {
+
+	};
+	phylistener->onContactSeparate = [](PhysicsContact& contact) {
+		auto spriteA = (Sprite*)contact.getShapeA()->getBody()->getNode();
+		auto spriteB = (Sprite*)contact.getShapeB()->getBody()->getNode();
+		if (spriteA && spriteA->getTag() == 1
+			&& spriteB && spriteB->getTag() == 1)
+		{
+			spriteA->setColor(Color3B::WHITE);
+			spriteB->setColor(Color3B::WHITE);
+		}
+
+
+	};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(phylistener, 1);
+
 }
 
 bool SpritesStorageLayer::touchBegan(Touch* touch, Event* event)
@@ -106,6 +151,6 @@ void SpritesStorageLayer::onExit()
 {
 	Layer::onExit();
 	log("MyScene onExit");
-	/*Director::getInstance()->getEventDispatcher()->removeEventListener(listener1);*/
+	Director::getInstance()->getEventDispatcher()->removeAllEventListeners();
 
 }
