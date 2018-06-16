@@ -30,6 +30,9 @@
     <ClCompile Include="..\Classes\SpritesStorageLayer.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\容器测试场景.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -48,6 +51,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\SpritesStorageLayer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\容器测试场景.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

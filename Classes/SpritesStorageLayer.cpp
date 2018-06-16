@@ -17,25 +17,25 @@ bool SpritesStorageLayer::init()
 
 	//创建三个方块精灵
 	Sprite* boxA = Sprite::create("BoxA.png");
-	auto bodyA = PhysicsBody::createCircle(boxA->getContentSize().width/2);
+	auto bodyA = PhysicsBody::createCircle(boxA->getContentSize().width/5);
 	bodyA->setContactTestBitmask(0xFFFFFFFF);
 	boxA->setPhysicsBody(bodyA);
 	boxA->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	addChild(boxA, 10, kBox1_Tag);
 
 	Sprite* boxB = Sprite::create("BoxB.png");
-	auto bodyB = PhysicsBody::createCircle(boxB->getContentSize().width / 2);
+	auto bodyB = PhysicsBody::createCircle(boxB->getContentSize().width / 5);
 	bodyB->setContactTestBitmask(0xFFFFFFFF);
 	boxB->setPhysicsBody(bodyB);
 	boxB->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2) + Vec2(40, 50));
-	addChild(boxB, 20, kBox2_Tag);
+	addChild(boxB, 10, kBox2_Tag);
 
 	Sprite* boxC = Sprite::create("BoxC.png");
-	auto bodyC = PhysicsBody::createCircle(boxC->getContentSize().width / 2);
+	auto bodyC = PhysicsBody::createCircle(boxC->getContentSize().width / 5);
 	bodyC->setContactTestBitmask(0xFFFFFFFF);
 	boxC->setPhysicsBody(bodyC);
 	boxC->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2) + Vec2(60, 20));
-	addChild(boxC, 30, kBox3_Tag);
+	addChild(boxC, 10, kBox3_Tag);
 
 	return true;
 }

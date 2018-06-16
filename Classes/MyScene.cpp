@@ -6,20 +6,22 @@
 
 #include "MyScene.h"
 USING_NS_CC;
-const PhysicsMaterial PHYSICSBODY_MATERIAL_NOmoca(0.1f, 0.5f, 0.0f);
+const PhysicsMaterial PHYSICSBODY_MATERIAL_NOmoca(0.1f, 0.0f, 0.0f);	//摩擦、弹性系数设置为0
 Sprite* SpritesStorageLayer::target = NULL;		//静态成员变量初始化
 Vec2 SpritesStorageLayer::targetLocation(0, 0);
 
 Scene* MyScene::createScene()
 {
 	auto scene = Scene::createWithPhysics();
-	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);//用于测试，最后要去掉
 	Vec2 gravity0(0, 0.0f);
-	scene->getPhysicsWorld()->setGravity(gravity0);
+	scene->getPhysicsWorld()->setGravity(gravity0);//设置重力为0
 	auto layer = MyScene::create();
 	auto spriteLayer = SpritesStorageLayer::create();
-	scene->addChild(spriteLayer, 100);
-	scene->addChild(layer,10);		//(层的名字，优先级，tag）
+	scene->addChild(spriteLayer, 0);
+	scene->addChild(layer,1);		//(层的名字，优先级，tag）
+	auto map = Setting2::create();
+	scene->addChild(map, 2);
 	return scene;
 }
 
@@ -75,15 +77,15 @@ bool MyScene::init()
 	////layers->addLayer();
 	//layers->switchTo(0);
 
-	//创建一个显示"MyScene"文字的Label
-	auto label = Label::createWithTTF("MyScene", "fonts/Marker Felt.ttf", 24);
-	//设置白色
-	label->setColor(Color3B::WHITE);
-	// 设置label在屏幕中的显示位置
-	label->setPosition(Vec2(origin.x + visibleSize.width / 2,
-		origin.y + visibleSize.height - label->getContentSize().height));
-	// 把label添加到画面层
-	this->addChild(label, 1);
+	////创建一个显示"MyScene"文字的Label
+	//auto label = Label::createWithTTF("MyScene", "fonts/Marker Felt.ttf", 24);
+	////设置白色
+	//label->setColor(Color3B::WHITE);
+	//// 设置label在屏幕中的显示位置
+	//label->setPosition(Vec2(origin.x + visibleSize.width / 2,
+	//	origin.y + visibleSize.height - label->getContentSize().height));
+	//// 把label添加到画面层
+	//this->addChild(label, 1);
 
 	
 
@@ -106,11 +108,11 @@ bool MyScene::onTouchBegan(Touch* touch, Event* event)
 {
 	auto target = static_cast<Sprite*>(event->getCurrentTarget());
 	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
-	if (SpritesStorageLayer::target != NULL)
+	if (Setting2::target != NULL)
 	{
-		SpritesStorageLayer::targetLocation = SpritesStorageLayer::target->getPosition();
-		SpritesStorageLayer::target->stopAllActions();
-		SpritesStorageLayer::target->runAction(MoveTo::create(SpritesStorageLayer::actionTime(locationInNode), touch->getLocation()));
+		Setting2::targetLocation = Setting2::target->getPosition();
+		Setting2::target->stopAllActions();
+		Setting2::target->runAction(MoveTo::create(Setting2::actionTime(locationInNode), touch->getLocation()));
 	}
 
 	return true;

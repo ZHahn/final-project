@@ -1,6 +1,7 @@
 #pragma once
 #include "cocos2d.h"  
 #include"SpritesStorageLayer.h"
+#include"ÈÝÆ÷²âÊÔ³¡¾°.h"
 USING_NS_CC;
 
 
