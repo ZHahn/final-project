@@ -9,6 +9,8 @@ USING_NS_CC;
 const PhysicsMaterial PHYSICSBODY_MATERIAL_NOmoca(0.1f, 0.0f, 0.0f);	//摩擦、弹性系数设置为0
 Sprite* SpritesStorageLayer::target = NULL;		//静态成员变量初始化
 Vec2 SpritesStorageLayer::targetLocation(0, 0);
+//std::vector<int> MyScene::targetList;
+
 
 Scene* MyScene::createScene()
 {
@@ -17,10 +19,11 @@ Scene* MyScene::createScene()
 	Vec2 gravity0(0, 0.0f);
 	scene->getPhysicsWorld()->setGravity(gravity0);//设置重力为0
 	auto layer = MyScene::create();
-	auto spriteLayer = SpritesStorageLayer::create();
-	scene->addChild(spriteLayer, 0);
+	//auto spriteLayer = SpritesStorageLayer::create();
+	//scene->addChild(spriteLayer, 0);
 	scene->addChild(layer,1);		//(层的名字，优先级，tag）
 	auto map = Setting2::create();
+	Setting2::layer = map;
 	scene->addChild(map, 2);
 	return scene;
 }
@@ -108,25 +111,61 @@ bool MyScene::onTouchBegan(Touch* touch, Event* event)
 {
 	auto target = static_cast<Sprite*>(event->getCurrentTarget());
 	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
-	if (Setting2::target != NULL)
-	{
-		Setting2::targetLocation = Setting2::target->getPosition();
-		Setting2::target->stopAllActions();
-		Setting2::target->runAction(MoveTo::create(Setting2::actionTime(locationInNode), touch->getLocation()));
-	}
-
+	Vec2 locationInWorld = touch->getLocation();//选中点的世界坐标
+	
+	//群体选中
+	//if(Setting2::targetList.empty())
+		Setting2::groupSelectBegin(locationInWorld.x, locationInWorld.y);
+	
 	return true;
 }
 
 void MyScene::onTouchMoved(Touch* touch, Event* event)
 {
-
+	auto target = static_cast<Sprite*>(event->getCurrentTarget());
+	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
+	Vec2 locationInWorld = touch->getLocation();//选中点的世界坐标
+	Setting2::drawRect(locationInWorld.x, locationInWorld.y);
 }
 
 void MyScene::onTouchEnded(Touch* touch, Event* event)
 {
+	auto target = static_cast<Sprite*>(event->getCurrentTarget());
+	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
+	Vec2 locationInWorld = touch->getLocation(); //松开点的世界坐标
+	Setting2::draw->clear();	//松开时清除矩形框
+	
+	//输入松开点的数据
+	if(Setting2::groupSelectBegin2(locationInWorld.x, locationInWorld.y))
+		//if (Setting2::targetList.empty())
+		{
+			return;
+		}
+	//单个移动
+	if (Setting2::target != NULL)
+	{
+		Setting2::targetLocation = Setting2::target->getPosition();
+		Setting2::target->stopAllActions();
+		//Setting2::target->stopAttack();
+		Setting2::target->runAction(MoveTo::create(Setting2::actionTime(locationInWorld, Setting2::target), touch->getLocation()));
+	}
+	//群体移动
+	//Setting2::groupSelectMove(touch->getLocation());
+	int number = Setting2::targetList.size();
+	if (number > 0)
+	{
+		Node* Gtarget;
+		for (int i = 0; i<number; i++)
+		{
+			Gtarget = Setting2::targetList[i];
+			Gtarget->stopAllActions();
+			//(MySprite*)Gtarget->stopAttack();
+			Gtarget->runAction(MoveTo::create(Setting2::actionTime(locationInWorld, (Sprite*)Gtarget), locationInWorld));
 
+		}
+	}
 }
+
 
 //void MyScene::onEnter()
 //{
