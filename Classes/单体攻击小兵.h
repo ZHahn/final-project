@@ -1,6 +1,7 @@
 #pragma once
 #include"cocos2d.h"
 #include"普通小兵.h"
+
 enum class SpriteType2   //精灵类型  
 {
 	PLAYER = 1,

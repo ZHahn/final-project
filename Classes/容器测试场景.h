@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cocos2d.h"
+#include"cocos2d.h"
 #include"MyScene.h"
 #include"普通小兵.h"
 #include"单体攻击小兵.h"
@@ -10,8 +10,28 @@
 
 #define MAX_COUNT 100
 USING_NS_CC;
-extern cocos2d::Layer* map;
 
+typedef enum
+{
+	state_move=0,
+	state_build=1
+}touchState;
+
+typedef enum
+{
+	barracksButtonTag=900
+}buildingButton;
+
+typedef enum
+{
+	barracks = 1900
+}building;
+
+typedef enum
+{
+	valid = 1,
+	invalid = 0
+}buildingPositionVal;
 
 
 class Setting2 : public cocos2d::Layer
@@ -19,7 +39,7 @@ class Setting2 : public cocos2d::Layer
 	
 public:
 	static cocos2d::__Array *list;
-	cocos2d::__Array *list2;
+	static cocos2d::__Array *list2;
 	cocos2d::__Array *list3;
 	static MySpriteonebyone* target;
 	static Vec2 targetLocation;
@@ -42,6 +62,13 @@ public:
 	static void clearRect();
 	static Layer* layer;
 	static DrawNode* draw;
+
+	//当前点击效果判断
+	static int touchState;	//判断点击的作用
+	static buildingPositionVal barracksVal;
+
+	//放置建筑
+	static void build(Vec2 position);
 
 	~Setting2();
 	/*static cocos2d::Scene* createScene();*/

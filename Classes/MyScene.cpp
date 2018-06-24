@@ -9,12 +9,13 @@ USING_NS_CC;
 const PhysicsMaterial PHYSICSBODY_MATERIAL_NOmoca(0.1f, 0.0f, 0.0f);	//摩擦、弹性系数设置为0
 Sprite* SpritesStorageLayer::target = NULL;		//静态成员变量初始化
 Vec2 SpritesStorageLayer::targetLocation(0, 0);
-//std::vector<int> MyScene::targetList;
+Scene* MyScene::stoMyScene;
 
 
 Scene* MyScene::createScene()
 {
 	auto scene = Scene::createWithPhysics();
+	MyScene::stoMyScene = scene;
 	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);//用于测试，最后要去掉
 	Vec2 gravity0(0, 0.0f);
 	scene->getPhysicsWorld()->setGravity(gravity0);//设置重力为0
@@ -57,12 +58,12 @@ bool MyScene::init()
 	//获取手机可视屏原点的坐标
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	//定义边界的世界
-	auto body = PhysicsBody::createEdgeBox(visibleSize, PHYSICSBODY_MATERIAL_NOmoca, 5.0f);
+	//定义边界的世界(没必要)
+	/*auto body = PhysicsBody::createEdgeBox(Size(visibleSize.width*10, visibleSize.height*10), PHYSICSBODY_MATERIAL_NOmoca, 5.0f);
 	auto edgeNode = Node::create();
-	edgeNode->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	edgeNode->setPosition(Vec2(visibleSize.width, visibleSize.height));
 	edgeNode->setPhysicsBody(body);
-	this->addChild(edgeNode);
+	this->addChild(edgeNode);*/
 
 	
 
@@ -112,6 +113,12 @@ bool MyScene::onTouchBegan(Touch* touch, Event* event)
 	auto target = static_cast<Sprite*>(event->getCurrentTarget());
 	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
 	Vec2 locationInWorld = touch->getLocation();//选中点的世界坐标
+	log("x=%f,y=%f", locationInWorld.x, locationInWorld.y);
+	/*if (Setting2::touchState == state_build)
+	{
+		Setting2::build(locationInWorld);
+		return false;
+	}*/
 	
 	//群体选中
 	//if(Setting2::targetList.empty())

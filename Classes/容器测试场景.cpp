@@ -1,3 +1,4 @@
+#pragma once
 #include"容器测试场景.h"
 #include "SimpleAudioEngine.h"
 #include "base/CCEventKeyboard.h"
@@ -16,12 +17,15 @@ MySpriteonebyone* Setting2::target = NULL;
 Vec2 Setting2::targetLocation(0, 0);
 vector<MySpriteonebyone*> Setting2::targetList;
 __Array* Setting2::list;
+__Array* Setting2::list2;
 float Setting2::max_x;
 float Setting2::max_y;
 float Setting2::min_x;
 float Setting2::min_y;
 Layer* Setting2::layer = NULL;
 DrawNode* Setting2::draw = NULL;
+int Setting2::touchState = 0;
+buildingPositionVal Setting2::barracksVal;
 
 
 
@@ -63,6 +67,11 @@ bool Setting2::init()
 	menu3->setPosition(Vec2(935, 320));
 	this->addChild(menu3, 20);
 
+	auto barracksButton = Sprite::create("r1.png");
+	barracksButton->setPosition(Vec2(1000, 260));
+	barracksButton->setTag(barracksButtonTag);
+	this->addChild(barracksButton, 20);
+
 	auto lan = Sprite::create("lan.jpg");
 	lan->setAnchorPoint(Vec2::ZERO);
 	lan->setPosition(Vec2(900, 0));
@@ -84,9 +93,9 @@ bool Setting2::init()
 	this->addChild(enemyhouse, 11,666);
 	this->getBloodbar(enemyhouse, 100.0f);
 
-	auto background = Sprite::create("1.jpg");
+	auto background = Sprite::create("bj.jpg");
 	background->setAnchorPoint(Vec2::ZERO);
-	background->setPosition(Vec2(0, 0));
+	background->setPosition(Vec2(-500, -800));
 	background->runAction(ScaleTo::create(0.02f, 3.0f));
 	this->addChild(background, 2,1);
 
@@ -121,7 +130,7 @@ void Setting2::menuCloseCAllback(Ref* pSender)
 		MySpriteonebyone* sprite = MySpriteonebyone::create(1);	//创建可控制精灵
 		//添加物理体积
 		auto bodyS = PhysicsBody::createCircle(sprite->getContentSize().width / 2);
-		bodyS->setContactTestBitmask(0xFFFFFFFF);
+		bodyS->setContactTestBitmask(0x01);
 		sprite->setPhysicsBody(bodyS);
 		//物理体积设定结束
 		this->list->addObject(sprite);
@@ -162,12 +171,18 @@ void Setting2::menuCloseCAllback(Ref* pSender)
 		}
 	}
 }
-void Setting2::menuCloseCAllback2(Ref* pSender)
+void Setting2::menuCloseCAllback2(Ref* pSender)	//添加建筑
 {
-	if (have == 0) {
+	if (have == 0) {	
 		Sprite* sprite = Sprite::create("powered.png");
 		this->list2->addObject(sprite);
 		//log("list->count() = %d", this->list->count());
+		//添加物理体积
+		auto bodyS = PhysicsBody::createBox(sprite->getContentSize());  //createCircle(sprite->getContentSize().width / 2);
+		bodyS->setContactTestBitmask(0x02);
+		bodyS->setDynamic(false);//设为静态
+		sprite->setPhysicsBody(bodyS);
+		//物理体积设定结束
 		Size visibleSize = Director::getInstance()->getVisibleSize();
 		
 		int x =0.5 * visibleSize.width;
@@ -216,7 +231,7 @@ void Setting2::onEnter()
 				//sprite->setPosition(sprite->getPosition() + Vec2(0, +50));
 			}
 		}
-		if (keyCode == EventKeyboard::KeyCode::KEY_W&&icon1->getPosition().y + 50 >=-1200)
+		if (keyCode == EventKeyboard::KeyCode::KEY_W&&icon1->getPosition().y + 50 >=-1500)
 		{
 			auto moveto = MoveTo::create(0.2, icon1->getPosition() + Vec2(+0, -50));
 			icon1->runAction(moveto);
@@ -264,7 +279,7 @@ void Setting2::onEnter()
 				//sprite->setPosition(sprite->getPosition() + Vec2(+50, 0));
 			}
 		}
-		if (keyCode == EventKeyboard::KeyCode::KEY_D&&icon1->getPosition().x + 50 >= -3150)
+		if (keyCode == EventKeyboard::KeyCode::KEY_D&&icon1->getPosition().x + 50 >= -4800)
 		{
 			auto moveto = MoveTo::create(0.2, icon1->getPosition() + Vec2(-50, 0));
 			icon1->runAction(moveto);
@@ -293,18 +308,18 @@ void Setting2::onEnter()
 	EventDispatcher *eventDispatcher = Director::getInstance()->getEventDispatcher();
 	eventDispatcher->addEventListenerWithSceneGraphPriority(listenerk, this);
 
-	////单点触摸监听器
-	//auto listener1 = EventListenerTouchOneByOne::create();
+	//单点触摸监听器
+	auto listener1 = EventListenerTouchOneByOne::create();
 
-	//listener1->setSwallowTouches(true);
-	//listener1->onTouchBegan = CC_CALLBACK_2(Setting2::touchBegan, this);
-	//listener1->onTouchMoved = CC_CALLBACK_2(Setting2::touchMoved, this);
-	//listener1->onTouchEnded = CC_CALLBACK_2(Setting2::touchEnded, this);
+	listener1->setSwallowTouches(true);
+	listener1->onTouchBegan = CC_CALLBACK_2(Setting2::touchBegan, this);
+	listener1->onTouchMoved = CC_CALLBACK_2(Setting2::touchMoved, this);
+	listener1->onTouchEnded = CC_CALLBACK_2(Setting2::touchEnded, this);
 
-	////注册监听器
-	//EventDispatcher* mouse_eventDispatcher = Director::getInstance()->getEventDispatcher();
-	/*_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1, getChildByTag(kBox1_Tag));
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1->clone(), getChildByTag(kBox2_Tag));
+	//注册监听器
+	EventDispatcher* _eventDispatcher = Director::getInstance()->getEventDispatcher();
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1, getChildByTag(barracksButtonTag));
+	/*_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1->clone(), getChildByTag(kBox2_Tag));
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1->clone(), getChildByTag(kBox3_Tag));*/
 }
 bool mt(MySprite *s1, MySprite *s2)
@@ -339,7 +354,12 @@ void Setting2::update(float dt)
 	if (times % 150 == 0 && have == 1)
 	{
 		times -= 150;
-		MySpriteonebyone* sprite = MySpriteonebyone::create(2);
+		MySprite* sprite = MySprite::create(2);	//敌方精灵
+		//添加物理体积
+		auto bodyS = PhysicsBody::createCircle(sprite->getContentSize().width / 2);
+		bodyS->setContactTestBitmask(0x01);
+		sprite->setPhysicsBody(bodyS);
+		//物理体积设定结束
 		this->list3->addObject(sprite);
 		sprite->setPosition(enemyhouse->getPosition());
 		int x1 = enemyhouse->getPosition().x;
@@ -362,7 +382,6 @@ void Setting2::update(float dt)
 		//注册监听器
 		EventDispatcher* mouse_eventDispatcher3 = Director::getInstance()->getEventDispatcher();
 		mouse_eventDispatcher3->addEventListenerWithSceneGraphPriority(listener3->clone(), sprite);
-		orgin_tag++;
 	}
 	if (times % 30 == 0) {
 		Ref* obj1 = nullptr;
@@ -372,21 +391,21 @@ void Setting2::update(float dt)
 			MySprite* sprite1 = (MySprite*)obj1;
 			if (sprite1->SpriteState != (int)SpriteState::DEAD)
 			{
-				CCARRAY_FOREACH(this->list3, obj3) {
-					MySprite* sprite3 = (MySprite*)obj3;
-					if (mt(sprite1, sprite3) && sprite3->SpriteState != (int)SpriteState::DEAD)
-					{
-						sprite1->attack();
-						sprite3->attack();
-						sprite1->hurt();
-						sprite3->hurt();
-						sprite3->removeChildByTag(2);
-						this->getBloodbar(sprite3, sprite3->HP);
-						sprite1->removeChildByTag(2);
-						this->getBloodbar(sprite1, sprite1->HP);
-					}
-					//else sprite1->setRotation(0);
-				}
+				//CCARRAY_FOREACH(this->list3, obj3) {
+				//	MySprite* sprite3 = (MySprite*)obj3;
+				//	if (/*mt(sprite1, sprite3) &&*/ sprite3->SpriteState != (int)SpriteState::DEAD)
+				//	{
+				//		//sprite1->attack();
+				//		//sprite3->attack();
+				//		//sprite1->hurt();
+				//		//sprite3->hurt();
+				//		sprite3->removeChildByTag(2);
+				//		this->getBloodbar(sprite3, sprite3->HP);
+				//		sprite1->removeChildByTag(2);
+				//		this->getBloodbar(sprite1, sprite1->HP);
+				//	}
+				//	//else sprite1->setRotation(0);
+				//}
 			}
 		}
 
@@ -395,11 +414,17 @@ void Setting2::update(float dt)
 	{
 		Ref* obj3 = nullptr;
 		CCARRAY_FOREACH(this->list3, obj3) {
-			MySprite* sprite3 = (MySprite*)obj3;
+			MySprite* sprite3 = (MySprite*)obj3;	//敌方精灵死亡
 			if (sprite3->HP <= 0)
 			{
 				sprite3->removeAllChildren();
 				sprite3->runAction(fadeOut);
+				sprite3->SpriteState = (int)SpriteState::DEAD;
+				////死亡时移除刚体
+				//PhysicsBody* body=sprite3->getPhysicsBody();
+				////body->removeFromWorld();
+				//MyScene::stoMyScene->getPhysicsWorld()->removeBody(body);
+				//sprite3->autorelease();
 				//this->list3->removeObject(sprite3);
 				//this->removeChild(sprite3);
 			}
@@ -412,6 +437,7 @@ void Setting2::update(float dt)
 			{
 				sprite1->removeAllChildren();
 				sprite1->runAction(fadeOut);
+				
 				//this->list->removeObject(sprite1);
 				//this->removeChild(sprite1);
 			}
@@ -448,14 +474,28 @@ bool Setting2::touchBegan(Touch* touch, Event* event)
 	//获取事件所绑定的target
 	auto target = static_cast<MySpriteonebyone*>(event->getCurrentTarget());
 	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());	//将getLocation返回的世界坐标转换为模型坐标
+	//log(touch->getLocation().x);
+	//log(touch->getLocation().y);
 	Size s = target->getContentSize();
 	Rect rect = Rect(0, 0, s.width, s.height);
+
+	if (rect.containsPoint(locationInNode)&&target->getTag()== barracksButtonTag)	//判断点击兵营，在点击处生成建筑
+	{
+		Sprite* sprite = Sprite::create("powered.png");
+		this->list2->addObject(sprite);
+
+		sprite->setPosition(touch->getLocation());
+		//this->removeChild(sprite);
+		this->addChild(sprite, 11, barracks);
+		this->getBloodbar(sprite, 100.0f);
+		return true;
+	}
 
 	//单击范围判断检测
 	if (rect.containsPoint(locationInNode)&&target->SpriteType == (int)SpriteType::PLAYER)	//点击我方精灵&&target.team == 1
 	{
-		log("sprite x = %f, y = %f", locationInNode.x, locationInNode.y);
-		log("sprite tag = %d", target->getTag());
+		//log("sprite x = %f, y = %f", locationInNode.x, locationInNode.y);
+		//log("sprite tag = %d", target->getTag());
 		//target->runAction(ScaleBy::create(0.06f, 1.06f));
 		Setting2::target = target;
 		Setting2::targetList.clear();	//点击单个目标时清空群体选中列表
@@ -482,9 +522,66 @@ bool Setting2::touchBegan(Touch* touch, Event* event)
 
 void Setting2::touchMoved(Touch* touch, Event* event)
 {
-	/*log("onTouchMoved");
-	auto target = static_cast<Sprite*>(event->getCurrentTarget());
-	target->setPosition(target->getPosition() + touch->getDelta());*/
+	//log("onTouchMoved");
+	//获取事件所绑定的target
+	auto target = static_cast<MySpriteonebyone*>(event->getCurrentTarget());
+	Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());	//将getLocation返回的世界坐标转换为模型坐标
+	Size s = target->getContentSize();
+	Rect rect = Rect(0, 0, s.width, s.height);
+	if (/*rect.containsPoint(locationInNode) && */target->getTag() == barracksButtonTag)	//拖动建筑
+	{
+		//auto realTarget = getChildByTag(barracks);
+		int a = Setting2::list2->count() - 1;
+		Sprite* realTarget = (Sprite*)Setting2::list2->objectAtIndex(a);
+		realTarget->setPosition(touch->getLocation());
+		//检测摆放位置是否与已有精灵重叠
+		Ref* obj = nullptr;
+		Setting2::barracksVal = valid;
+		Sprite* oldTarget;
+		CCARRAY_FOREACH(this->list, obj) {
+			oldTarget = (Sprite*)obj;
+			if (realTarget->boundingBox().intersectsRect(oldTarget->boundingBox()))
+			{
+				//realTarget->setColor(ccc3(225, 0, 25));
+				Setting2::barracksVal = invalid;
+			}
+		}
+		//for (int i = 0; i < Setting2::list2->count() - 1; i++)
+		//{
+		//	obj = Setting2::list2[i];
+		//	if (realTarget->boundingBox().intersectsRect(oldTarget->boundingBox()))
+		//	{
+		//		//realTarget->setColor(ccc3(225, 0, 25));
+		//		Setting2::barracksVal = invalid;
+		//	}
+		//}
+		CCARRAY_FOREACH(this->list2, obj) {
+			oldTarget = (Sprite*)obj;
+			if(realTarget!=oldTarget)
+			if (realTarget->boundingBox().intersectsRect(oldTarget->boundingBox()))
+			{
+				//realTarget->setColor(ccc3(225, 0, 25));
+				Setting2::barracksVal = invalid;
+			}
+		}
+		CCARRAY_FOREACH(this->list3, obj) {
+			oldTarget = (Sprite*)obj;
+			if (realTarget->boundingBox().intersectsRect(oldTarget->boundingBox()))
+			{
+				//realTarget->setColor(ccc3(225, 0, 25));
+				Setting2::barracksVal = invalid;
+			}
+
+		}
+		if (Setting2::barracksVal == invalid)
+		{
+			realTarget->setColor(ccc3(225, 0, 25));
+		}
+		else
+		{
+			realTarget->setColor(ccc3(225, 255, 255));
+		}
+	}
 }
 
 void Setting2::touchEnded(Touch* touch, Event* event)
@@ -504,6 +601,13 @@ void Setting2::touchEnded(Touch* touch, Event* event)
 	//target->runAction(ScaleTo::create(0.06f, 1.0f));
 	//
 	//}
+	//若摆放位置非法，则移除被拖动的建筑
+	if (Setting2::barracksVal == invalid)
+	{
+		//removeChildByTag(barracks);
+		Ref* obj = Setting2::list2->objectAtIndex(Setting2::list2->count()-1);
+		removeChild((Sprite*)obj);
+	}
 
 
 }
@@ -613,6 +717,20 @@ void Setting2::getBloodbar(Sprite *guaisprite, float a) { //guaispirte为怪物精灵
 	guaisprite->addChild(pBloodProGress, 1, 2);
 }
 
+//void Setting2::build(Vec2 position)	//点击地面创建建筑
+//{
+//	Sprite* sprite = Sprite::create("powered.png");
+//	Setting2::list2->addObject(sprite);
+//	Size visibleSize = Director::getInstance()->getVisibleSize();
+//
+//	int x = 0.5 * visibleSize.width;
+//	int y = 0.5 * visibleSize.height;
+//	sprite->setPosition(position);
+//	//this->removeChild(sprite);
+//	Setting2::layer->addChild(sprite, 11, 5); have++;
+//	//Setting2::layer->getBloodbar(sprite, 100.0f);
+//	Setting2::touchState = state_move;	//重置点击状态为移动
+//}
 //void Setting2::onExit()
 //{
 //	Layer::onExit();

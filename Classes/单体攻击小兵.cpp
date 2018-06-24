@@ -1,3 +1,5 @@
+#pragma once
+
 #include"cocos2d.h"
 #include"µ¥Ìå¹¥»÷Ð¡±ø.h"
 
@@ -46,8 +48,18 @@ void MySpriteonebyone::attack(MySprite* attacked)//¹¥»÷ÆÕÍ¨Ð¡±ø
 	this->stopAllActions();
 	int x = this->getPosition().x;
 	int y = this->getPosition().y;
-	auto moveto = MoveTo::create(0.2, attacked->getPosition());
-	auto moveback = MoveTo::create(0.3, Vec2(x, y));
+	Sprite *sprite = Sprite::create("pump_flare_02.png");
+	this->addChild(sprite, 10); sprite->setPosition(0, 0);
+	sprite->setScale(0.5, 0.5f);
+
+	auto moveto = MoveTo::create(0.5, Vec2(attacked->getPosition().x - x, attacked->getPosition().y - y));
+	auto fadeout = FadeOut::create(0.1);
+	auto seq = Sequence::create(moveto, fadeout, nullptr);
+	sprite->runAction(seq);
+	/*auto moveto = MoveTo::create(0.2, Vec2(attacked->getPosition()));
+	auto moveback= MoveTo::create(0.3,Vec2(x,y));
+	auto seq = Sequence::create(moveto, moveback, nullptr);
+	this->runAction(seq);*/
 }
 void MySpriteonebyone::attack(MySpriteonebyone* attacked)//¹¥»÷µ¥»÷Ð¡±ø	
 {
@@ -55,9 +67,21 @@ void MySpriteonebyone::attack(MySpriteonebyone* attacked)//¹¥»÷µ¥»÷Ð¡±ø
 	this->stopAllActions();
 	int x = this->getPosition().x;
 	int y = this->getPosition().y;
-	auto moveto = MoveTo::create(0.2, attacked->getPosition());
+	Sprite *sprite = Sprite::create("pump_flare_02.png");
+	this->addChild(sprite, 10); sprite->setPosition(0, 0);
+	sprite->setScale(0.5, 0.5f);
+
+	auto moveto = MoveTo::create(0.5, Vec2(attacked->getPosition().x - x, attacked->getPosition().y - y));
+	auto fadeout = FadeOut::create(0.1);
+	auto seq = Sequence::create(moveto, fadeout, nullptr);
+	sprite->runAction(seq);
+	/*auto moveto = MoveTo::create(0.2, Vec2(attacked->getPosition()));
 	auto moveback = MoveTo::create(0.3, Vec2(x, y));
+	auto seq = Sequence::create(moveto, moveback, nullptr);
+	this->runAction(seq);*/
 }
+
+
 void MySpriteonebyone::hurt()//ÊÜÉË
 {
 	this->HP -= 20;
